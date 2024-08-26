@@ -25,7 +25,7 @@
         {
             "label": "CS285HW1",
             "type": "shell",
-            "command": "/opt/anaconda3/envs/peyman_conda_env/bin/python",
+            "command": "/opt/anaconda3/envs/cs285/bin/python",
             "args": [
                 "cs285/scripts/run_hw1.py",
                 "--expert_policy_file",

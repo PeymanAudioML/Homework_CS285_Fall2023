@@ -18,7 +18,13 @@ def sample_trajectory(env, policy, max_path_length, render=False):
     """Sample a rollout in the environment from a policy."""
 
     # initialize env for the beginning of a new rollout
-    ob =  env.reset() # TODO: initial observation after resetting the env
+     #initial observation after resetting the env
+    ob = env.reset()
+
+    # if isinstance(ob, np.ndarray):
+    #     ob = torch.from_numpy(ob).float()
+    # elif isinstance(ob, torch.Tensor):
+    #     ob = ob.float()
 
     # init vars
     obs, acs, rewards, next_obs, terminals, image_obs = [], [], [], [], [], []
@@ -34,22 +40,16 @@ def sample_trajectory(env, policy, max_path_length, render=False):
             image_obs.append(cv2.resize(img, dsize=(250, 250), interpolation=cv2.INTER_CUBIC))
 
         # TODO use the most recent ob to decide what to do
-        obs.append(ob)
-        if not isinstance(ob, torch.FloatTensor):
-            ob = torch.FloatTensor(ob[0])
-        ac = policy(ob)
-        ac = ac[0]
-        acs.append(ac)
+        ac = ptu.to_numpy(policy(ptu.from_numpy(ob)))      
+
 
         # TODO: take that action and get reward and next ob
         next_ob, rew, done, _ = env.step(ac)
 
         # TODO rollout can end due to done, or due to max_path_length
         steps += 1
-        next_obs.append(ob)
-        rewards.append(rew)
-        rollout_done = (steps >= max_path_length) or done # HINT: this is either 0 or 1
-        terminals.append(rollout_done)
+        rollout_done = 1 if done or steps >= max_path_length else 0
+        
 
         # record result of taking that action
         obs.append(ob)

@@ -126,13 +126,13 @@ class MLPPolicySL(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
             action: sampled action(s) from the policy
         """
 
-
-
         mean=self.mean_net(observation)  # mean of the policy
+
         std = torch.exp(self.logstd)
-        dist=distributions.Normal(mean,std)  # normal distribution with mean and std
-        action=dist.rsample()  # sample action from the distribution
-        return action
+        action_distribution = distributions.Normal(mean,std)  # normal distribution with mean and std
+        action_sampled = action_distribution.rsample()  # sample action from the distribution
+        action_sampled = torch.tanh(action_sampled)  # tanh squashing
+        return action_sampled
 
     def update(self, observations, actions):
         """
@@ -143,6 +143,7 @@ class MLPPolicySL(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
         :return:
             dict: 'Training Loss': supervised learning loss
         """
+        
 
         if isinstance(observations, np.ndarray):
             observations = torch.from_numpy(observations).float()
